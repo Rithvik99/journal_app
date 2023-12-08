@@ -1,6 +1,4 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:journal_app/screens/homescreen.dart';
 import 'package:journal_app/screens/loginscreen.dart';
 import 'package:journal_app/screens/navbar.dart';
 import 'package:journal_app/services/auth.dart';
@@ -42,6 +40,26 @@ class _RegisterScreenState extends State<RegisterScreen> {
           ),
         );
       }
+    }
+  }
+
+  // google login
+  googleLogIn() async {
+    try{
+      bool google = await _auth.signInWithGoogle();
+
+      if(google){
+        Navigator.push(context, MaterialPageRoute(builder: (context)=>NavBar(auth: _auth)));
+      } else{
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text("Error occured while creating account"),
+          ),
+        );
+      }
+    } catch(e){
+      print("Google Login Error");
+      print(e);
     }
   }
 
@@ -170,7 +188,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
         minWidth: MediaQuery.of(context).size.width,
         padding: const EdgeInsets.fromLTRB(20.0, 15.0, 20.0, 15.0),
         onPressed: () {
-          // Handle Google login logic here
+          googleLogIn();
         },
         child: const Row(
           mainAxisAlignment: MainAxisAlignment.center,

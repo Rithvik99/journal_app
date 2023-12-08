@@ -39,6 +39,26 @@ class _LoginScreenState extends State<LoginScreen> {
     }
   }
 
+  // google login
+  googleLogIn() async {
+    try{
+      bool google = await _auth.signInWithGoogle();
+
+      if(google){
+        Navigator.push(context, MaterialPageRoute(builder: (context)=>NavBar(auth: _auth)));
+      } else{
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text("Error occured while creating account"),
+          ),
+        );
+      }
+    } catch(e){
+      print("Google Login Error");
+      print(e);
+    }
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -139,7 +159,7 @@ class _LoginScreenState extends State<LoginScreen> {
         minWidth: MediaQuery.of(context).size.width,
         padding: const EdgeInsets.fromLTRB(20.0, 15.0, 20.0, 15.0),
         onPressed: () {
-          _auth.signWithGoogle(context);
+          googleLogIn();
         },
         child: const Row(
           mainAxisAlignment: MainAxisAlignment.center,

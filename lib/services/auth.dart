@@ -18,37 +18,6 @@ class AuthMethods{
   Map<String, dynamic>? userData;
   Map<String, dynamic>? userJournals;
 
-  signWithGoogle(BuildContext context)async{
-    final FirebaseAuth firebaseAuth = FirebaseAuth.instance;
-    final GoogleSignIn googleSignIn = GoogleSignIn();
-
-    final GoogleSignInAccount? googleSignInAccount = await googleSignIn.signIn();
-
-    final GoogleSignInAuthentication googleSignInAuthentication = await googleSignInAccount!.authentication;
-
-    final AuthCredential credential = GoogleAuthProvider.credential(
-      idToken: googleSignInAuthentication.idToken,
-      accessToken: googleSignInAuthentication.accessToken
-    );
-
-    UserCredential result = await firebaseAuth.signInWithCredential(credential);
-
-    User? userDetails = result.user;
-
-    if(result != null){
-      Map<String, dynamic> userInfoMap = {
-        "email": userDetails!.email,
-        "username": userDetails.displayName,
-        "profilePic": userDetails.photoURL,
-        "id": userDetails.uid
-      };
-
-      // await DatabaseMethods().addUserInfoToDB(userDetails.uid, userInfoMap).then((value) => {
-        // Navigator.push(context, MaterialPageRoute(builder: (context)=>NavBar()))
-      // });
-    }
-  }
-
   // Similar to above signin with google now perform singup with email and password
   // Firstly you need to validate if the user is already registered or not
   Future<bool> signUpWithEmailAndPassword(String email, String password, String username, BuildContext context)async{
@@ -63,6 +32,7 @@ class AuthMethods{
         'journals': [],
         'google': '',
         'facebook': '',
+        'profilePic': '',
         'date': convertDate(DateTime.now())
       });
 
@@ -147,7 +117,7 @@ class AuthMethods{
     }
   }
 
-  Future<void> addJournalEntry(String date, String title, String content)async{
+  Future<void> addJournalEntry(String content, String title, String date)async{
     try{
       DocumentReference journalDoc = await _journals.add({
         'title': title,
@@ -167,6 +137,93 @@ class AuthMethods{
 
     }catch(e){
       print("Adding Journal Entry Error");
+      print(e);
+    }
+  }
+
+  Future<bool> signInWithGoogle() async {
+    try{
+      await GoogleSignIn().signOut();
+      final GoogleSignInAccount? googleUser = await GoogleSignIn(forceCodeForRefreshToken: true).signIn();
+
+      if(googleUser == null){
+        return false;
+      }
+
+      final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
+      final OAuthCredential credential = GoogleAuthProvider.credential(
+        accessToken: googleAuth.accessToken,
+        idToken: googleAuth.idToken
+      );
+
+      UserCredential result = await auth.signInWithCredential(credential);
+      User? userDeatils = result.user;
+
+      DocumentSnapshot userDoc = await _users.doc(userDeatils?.uid).get();
+
+      String gmail = userDeatils?.email ?? '';
+      String? username = userDeatils?.displayName ?? '';
+
+      if (userDoc.exists) {
+        print('User Already Exists');
+        await _users.doc(userDeatils?.uid).update({
+          'google': gmail,
+          'profilePic': userDeatils?.photoURL,
+        });
+      } else {
+        await _users.doc(userDeatils?.uid).set({
+          'username': username,
+          'email': gmail,
+          'journals': [],
+          'google': gmail,
+          'facebook': '',
+          'profilePic': userDeatils?.photoURL,
+          'date': convertDate(DateTime.now())
+        });
+        print('User Added to Db');
+      }
+
+      userDoc = await _users.doc(userDeatils?.uid).get();
+      print("User Doc Fetched");
+
+      if (userDoc.exists) {
+        userData = userDoc.data() as Map<String, dynamic>;
+        print("User Data Stored");
+      }
+
+      return true;
+    } on FirebaseAuthException catch (e) {
+      print("Fetch Error : ${e.code}");
+      return false;
+    }
+  }
+
+  // Linking Google Account to Already Existing Account
+  Future<void> linkAccountWithGoogle() async{
+    try{
+      await GoogleSignIn().signOut();
+      GoogleSignInAccount? googleSignInAccount = await GoogleSignIn(forceCodeForRefreshToken: true).signIn();
+      GoogleSignInAuthentication googleSignInAuthentication = await googleSignInAccount!.authentication;
+      AuthCredential googleCredential = GoogleAuthProvider.credential(
+        accessToken: googleSignInAuthentication.accessToken,
+        idToken: googleSignInAuthentication.idToken
+      );
+
+      print("Google Credential Created");
+
+      User? user = auth.currentUser;
+      await user!.linkWithCredential(googleCredential);
+
+      print("Google Account Linked");
+
+      await _users.doc(user.uid).update({
+        'google': googleSignInAccount.email
+      });
+
+      userData!['google'] = googleSignInAccount.email;
+      print("Account Linked to Db");
+    } catch(e){
+      print("Linking Google Account Error");
       print(e);
     }
   }
