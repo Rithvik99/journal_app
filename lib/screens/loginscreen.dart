@@ -1,6 +1,4 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:journal_app/screens/homescreen.dart';
 import 'package:journal_app/screens/navbar.dart';
 import 'package:journal_app/screens/registerscreen.dart';
 import 'package:journal_app/services/auth.dart';
@@ -26,24 +24,18 @@ class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
 
+  final AuthMethods _auth = AuthMethods();
+
   useLogin()async{
-    try{
-      await FirebaseAuth.instance.signInWithEmailAndPassword(email: email, password: password);
-      Navigator.push(context, MaterialPageRoute(builder: (context)=>NavBar()));
-    } on FirebaseAuthException catch(e){
-      if(e.code == 'user-not-found'){
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text("No user found for that email"),
-          ),
-        );
-      }else if(e.code == 'wrong-password'){
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text("Wrong password provided for that user"),
-          ),
-        );
-      }
+    bool logged = await _auth.logInWithEmailPassword(email, password);
+    if(logged){
+      Navigator.push(context, MaterialPageRoute(builder: (context)=>NavBar(auth: _auth)));
+    }else{
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("Error occured while logging in"),
+        ),
+      );
     }
   }
 
@@ -147,7 +139,7 @@ class _LoginScreenState extends State<LoginScreen> {
         minWidth: MediaQuery.of(context).size.width,
         padding: const EdgeInsets.fromLTRB(20.0, 15.0, 20.0, 15.0),
         onPressed: () {
-          AuthMethods().signWithGoogle(context);
+          _auth.signWithGoogle(context);
         },
         child: const Row(
           mainAxisAlignment: MainAxisAlignment.center,

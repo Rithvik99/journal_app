@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:journal_app/screens/homescreen.dart';
-import 'package:journal_app/screens/loginscreen.dart';
 import 'package:journal_app/screens/profilescreen.dart';
+import 'package:journal_app/services/auth.dart';
 
 
 class NavBar extends StatefulWidget {
+  final AuthMethods auth;
+  const NavBar({super.key, required this.auth});
+
   @override
   _NavBarState createState() => _NavBarState();
 }
@@ -12,13 +15,14 @@ class NavBar extends StatefulWidget {
 class _NavBarState extends State<NavBar> {
   int _selectedIndex = 0;
 
-  static final List<Widget> _pages = <Widget>[
-    const HomeScreen(),
-    ProfileScreen(),
-  ];
-
   @override
   Widget build(BuildContext context) {
+    
+    final List<Widget> _pages = <Widget>[
+      HomeScreen(auth: widget.auth),
+      ProfileScreen(),
+    ];
+
     return Scaffold(
       body: _pages[_selectedIndex],
       bottomNavigationBar: BottomNavigationBar(

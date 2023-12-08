@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:journal_app/screens/addjournalscreen.dart';
 import 'package:journal_app/screens/viewjournalscreen.dart';
+import 'package:journal_app/services/auth.dart';
 import 'package:table_calendar/table_calendar.dart';
 
 class HomeScreen extends StatefulWidget {
-  const HomeScreen({super.key});
+  final AuthMethods auth;
+  const HomeScreen({super.key, required this.auth});
+
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
@@ -21,30 +24,34 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+
+    String name = widget.auth.fetchField("username") ?? "";
+    String date = widget.auth.fetchField("date") ?? "";
+
     return Scaffold(
-      body: content(),
+      body: content(name, date),
     );
   }
 
-  Widget content() {
+  Widget content(String name, String date) {
     return Padding(
       padding: const EdgeInsets.all(10.0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           const SizedBox(height: 30),
-          const Row(
+          Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Row(
               children: [
-                CircleAvatar(
+                const CircleAvatar(
                   backgroundImage: AssetImage("assets/google.png"),
                   radius: 20,
                 ),
                 SizedBox(width: 10),
                 Text(
-                  "Hi, John Doe",
+                  "Hi, "+name,
                   style: TextStyle(fontSize: 18),
                 ),
               ],
@@ -104,7 +111,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => AddJournal(),
+                    builder: (context) => AddJournal(date: today.toString().split(' ')[0], auth: widget.auth),
                   ),
                 );
               },

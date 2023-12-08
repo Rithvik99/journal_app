@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:journal_app/screens/homescreen.dart';
 import 'package:journal_app/screens/loginscreen.dart';
 import 'package:journal_app/screens/navbar.dart';
+import 'package:journal_app/services/auth.dart';
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
@@ -26,36 +27,20 @@ class _RegisterScreenState extends State<RegisterScreen> {
   final TextEditingController emailEditingController = TextEditingController();
   final TextEditingController passwordEditingController = TextEditingController();
 
+  final AuthMethods _auth = AuthMethods();
+
 
   registration()async{
     if(password!=null && userNameEditingController.text!="" && emailEditingController.text!=""){
-      try{
-        UserCredential userCredential = await FirebaseAuth.instance.createUserWithEmailAndPassword(email: email, password: password);
+      bool created = await _auth.signUpWithEmailAndPassword(emailEditingController.text, passwordEditingController.text, userNameEditingController.text, context);
+      if(created){
+        Navigator.push(context, MaterialPageRoute(builder: (context)=>NavBar(auth: _auth)));
+      } else{
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text('Registration Successful'),
+            content: Text("Error occured while creating account"),
           ),
         );
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => NavBar(),
-          ),
-        );
-      }on FirebaseAuthException catch(e){
-        if(e.code == 'weak-password'){
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('The password provided is too weak'),
-            ),
-          );
-        }else if(e.code == 'email-already-in-use'){
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('The account already exists for that email'),
-            ),
-          );
-        }
       }
     }
   }
