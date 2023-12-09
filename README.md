@@ -81,23 +81,50 @@ OAuth (Open Authorization) is employed to securely access user resources on a se
 ### Testing Environment:
    - Android simulator
 
-## Setting Up a Basic Flutter App
+# Setup
 
-To set up and run the basic Flutter app:
+Follow these steps to set up your Flutter app on your local machine:
 
-1. **Install Flutter:**
-   - Follow the instructions on the [official Flutter installation guide](https://flutter.dev/docs/get-started/install) to set up Flutter on your machine.
+## Prerequisites
+Before you get started, make sure you have the following installed:
 
-2. **Install Dependencies:**
-   - Open a terminal and navigate to the project root directory.
-   - Run `flutter pub get` to install the project dependencies.
+- Flutter SDK
+- Git
 
-3. **Run the App:**
-   - Connect a device or start an emulator.
-   - Run `flutter run` in the terminal to build and launch the app on your device/emulator.
+## Clone the Repository
+Clone the repository to your local machine and navigate to the project directory:
 
-4. **Explore the Code:**
-   - Dive into the `lib` directory to explore the source code.
-   - Make any necessary adjustments based on your project requirements.
+```bash
+git clone https://github.com/Rithvik99/journal_app
+cd journal_app
+```
+
+## Get Dependencies
+Run the following command to fetch the necessary dependencies:
+
+```bash
+flutter pub get
+```
+
+## USB Debugging
+Ensure that USB debugging is enabled on your Android device. If you're unsure how to do this, refer to the Android Developer Documentation.
+
+## Run the App
+Connect your Android device to your computer and run the app using the following command:
+
+```bash
+flutter run
+```
+
+This command will build the app and install it on your connected Android device.
+
+## Build the App
+To create a standalone APK for your application, use the following command:
+
+```bash
+flutter build apk
+```
+
+You'll find the built APK file in the `build/app/outputs/flutter-apk/` directory. Install this APK on your Android device by transferring it to the device and opening the file using a file manager.
 
 Feel free to explore the source code and contribute to the development of this intuitive and secure journaling application. Happy journaling!
