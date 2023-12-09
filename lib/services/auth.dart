@@ -228,6 +228,12 @@ class AuthMethods{
     }
   }
 
+  Future<void> logout() async {
+    await auth.signOut();
+    userData = null;
+    userJournals = null;
+  }
+
   String convertDate(DateTime date) {
     String day = date.day.toString().padLeft(2, '0');
     String month = date.month.toString().padLeft(2, '0');

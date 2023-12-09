@@ -20,7 +20,7 @@ class _NavBarState extends State<NavBar> {
     
     final List<Widget> _pages = <Widget>[
       HomeScreen(auth: widget.auth),
-      ProfileScreen(),
+      ProfileScreen(auth: widget.auth),
     ];
 
     return Scaffold(

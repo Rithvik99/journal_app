@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:journal_app/services/auth.dart';
 
 class ProfileScreen extends StatefulWidget {
-  const ProfileScreen({super.key});
+  final AuthMethods auth;
+  const ProfileScreen({super.key, required this.auth});
 
   @override
   State<ProfileScreen> createState() => _ProfileScreenState();
@@ -10,6 +12,17 @@ class ProfileScreen extends StatefulWidget {
 class _ProfileScreenState extends State<ProfileScreen> {
   @override
   Widget build(BuildContext context) {
+    String name = widget.auth.fetchField("username") ?? "";
+    String date = widget.auth.fetchField("date") ?? "";
+    String uriI = widget.auth.fetchField("profilePic") ?? "";
+    if (uriI == "") {
+      uriI =
+          "https://www.pngitem.com/pimgs/m/30-307416_profile-icon-png-image-free-download-searchpng-employee.png";
+    }
+    String gConnected = widget.auth.fetchField("google") ?? "Connect with Google";
+    if (gConnected == "") {
+      gConnected = "Connect with Google";
+    }
     return Scaffold(
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -23,32 +36,25 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 children: [
                   CircleAvatar(
                     radius: 50,
-                    backgroundImage: AssetImage('assets/profile_picture.jpg'),
+                    backgroundImage: NetworkImage(uriI),
                   ),
-                  SizedBox(height: 16),
+                  const SizedBox(height: 16),
                   Text(
-                    'User Name',
-                    style: TextStyle(
+                    name,
+                    style: const TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                  SizedBox(height: 8),
+                  const SizedBox(height: 8),
                   Text(
-                    'Joining Date: January 1, 2023',
-                    style: TextStyle(
+                    'Joining Date: $date',
+                    style: const TextStyle(
                       fontSize: 14,
                       color: Colors.grey,
                     ),
                   ),
-                  SizedBox(height: 8),
-                  Text(
-                    'Journal Entries: 10',
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: Colors.grey,
-                    ),
-                  ),
+                  const SizedBox(height: 8),
                 ],
               ),
             ),
@@ -62,45 +68,58 @@ class _ProfileScreenState extends State<ProfileScreen> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
-                  ElevatedButton(
+                  ElevatedButton.icon(
                     onPressed: () {
-                      // Add functionality for the button
+                      // Add functionality for Sync Data button
                     },
                     style: ElevatedButton.styleFrom(
-                      primary: Colors.red,
+                      backgroundColor: Colors.blue, // Use a different color for Sync Data
+                      onPrimary: Colors.white, // Text color
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10.0),
+                      ),
+                      padding: EdgeInsets.symmetric(vertical: 16.0),
+                      minimumSize: Size(double.infinity, 0),
                     ),
-                    child: Text('Button 1'),
+                    icon: Icon(Icons.sync),
+                    label: Text('Sync Data'),
                   ),
-                  ElevatedButton(
+                  ElevatedButton.icon(
                     onPressed: () {
-                      // Add functionality for the button
+                      // Add functionality for Connect with Google button
                     },
                     style: ElevatedButton.styleFrom(
-                      primary: Colors.red,
+                      backgroundColor: Colors.green, // Use a different color for Connect with Google
+                      onPrimary: Colors.white, // Text color
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10.0),
+                      ),
+                      padding: EdgeInsets.symmetric(vertical: 16.0),
+                      minimumSize: Size(double.infinity, 0),
                     ),
-                    child: Text('Button 2'),
+                    icon: Icon(Icons.g_mobiledata),
+                    label: Text(gConnected),
                   ),
-                  ElevatedButton(
+                  ElevatedButton.icon(
                     onPressed: () {
-                      // Add functionality for the button
+                      widget.auth.logout();
+                      Navigator.pop(context);
                     },
                     style: ElevatedButton.styleFrom(
-                      primary: Colors.red,
+                      backgroundColor: Colors.red, // Use a different color for Log Out
+                      onPrimary: Colors.white, // Text color
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10.0),
+                      ),
+                      padding: EdgeInsets.symmetric(vertical: 16.0),
+                      minimumSize: Size(double.infinity, 0),
                     ),
-                    child: Text('Button 3'),
-                  ),
-                  ElevatedButton(
-                    onPressed: () {
-                      // Add functionality for the button
-                    },
-                    style: ElevatedButton.styleFrom(
-                      primary: Colors.red,
-                    ),
-                    child: Text('Button 4'),
+                    icon: Icon(Icons.exit_to_app),
+                    label: Text('Log Out'),
                   ),
                 ],
               ),
-            ),
+            )
           ],
         ),
       ),

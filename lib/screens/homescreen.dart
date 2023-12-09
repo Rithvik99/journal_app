@@ -28,7 +28,10 @@ class _HomeScreenState extends State<HomeScreen> {
     String name = widget.auth.fetchField("username") ?? "";
     String date = widget.auth.fetchField("date") ?? "";
     String uriI = widget.auth.fetchField("profilePic") ?? "";
-    print(uriI);
+    if (uriI == "") {
+      uriI =
+          "https://www.pngitem.com/pimgs/m/30-307416_profile-icon-png-image-free-download-searchpng-employee.png";
+    }
 
     return Scaffold(
       body: Padding(
