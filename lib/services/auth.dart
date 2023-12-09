@@ -281,6 +281,7 @@ class AuthMethods{
         );
         final Map<String, dynamic> facebookUserData = json.decode(graphResponse.body);
         String facebookEmail = facebookUserData['email'] ?? '';
+        print(facebookEmail);
 
 
       // Modify fields
@@ -305,26 +306,13 @@ class AuthMethods{
       if (result.status == LoginStatus.success) {
         final AccessToken accessToken = result.accessToken!;
         final graphResponse = await http.get(
-          // Uri.parse('https://graph.facebook.com/v14.0/me?fields=id,name,email,picture'),
-          Uri.parse('https://graph.facebook.com/v2.12/me?fields=id,name,email,picture.width(800).height(800)'),
+          Uri.parse('https://graph.facebook.com/v14.0/me?fields=id,name,email,picture'),
           headers: {'Authorization': 'Bearer ${accessToken.token}'},
         );
         final Map<String, dynamic> userData2 = json.decode(graphResponse.body);
-        print("hii there");
-        print(userData2);
+        
         String facebookName = userData2['name'] ?? '';
         String facebookEmail = userData2['email'] ?? '';
-        // Extract profile picture URL
-        String profilePicUrl = '';
-        if (userData2.containsKey('picture') &&
-            userData2['picture'] != null &&
-            userData2['picture'].containsKey('data') &&
-            userData2['picture']['data'] != null &&
-            userData2['picture']['data'].containsKey('url')) {
-          profilePicUrl = userData2['picture']['data']['url'];
-        }
-        print("Pic URL");
-        print(profilePicUrl);
         final AuthCredential creds =
         FacebookAuthProvider.credential(result.accessToken!.token);
         UserCredential auth2 = await auth.signInWithCredential(creds);
