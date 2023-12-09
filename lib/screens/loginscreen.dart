@@ -29,7 +29,10 @@ class _LoginScreenState extends State<LoginScreen> {
   useLogin()async{
     bool logged = await _auth.logInWithEmailPassword(email, password);
     if(logged){
-      Navigator.push(context, MaterialPageRoute(builder: (context)=>NavBar(auth: _auth)));
+      // clear the text controllers
+      _emailController.clear();
+      _passwordController.clear();
+      Navigator.push(context, MaterialPageRoute(builder: (context)=>NavBar(auth: _auth, type: "email")));
     }else{
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
@@ -45,7 +48,10 @@ class _LoginScreenState extends State<LoginScreen> {
       bool google = await _auth.signInWithGoogle();
 
       if(google){
-        Navigator.push(context, MaterialPageRoute(builder: (context)=>NavBar(auth: _auth)));
+        // clear the text controllers
+        _emailController.clear();
+        _passwordController.clear();
+        Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=>NavBar(auth: _auth, type: "google")));
       } else{
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
@@ -65,7 +71,10 @@ class _LoginScreenState extends State<LoginScreen> {
       bool facebook = await _auth.oauth_facebook();
 
       if(facebook){
-        Navigator.push(context, MaterialPageRoute(builder: (context)=>NavBar(auth: _auth)));
+        // clear the text controllers
+        _emailController.clear();
+        _passwordController.clear();
+        Navigator.push(context, MaterialPageRoute(builder: (context)=>NavBar(auth: _auth, type: "facebook")));
       } else{
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
@@ -290,6 +299,9 @@ class _LoginScreenState extends State<LoginScreen> {
                         const SizedBox(width: 5.0),
                         GestureDetector(
                           onTap: () {
+                            // clear the text controllers
+                            _emailController.clear();
+                            _passwordController.clear();
                             Navigator.push(
                               context,
                               MaterialPageRoute(

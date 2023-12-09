@@ -3,7 +3,8 @@ import 'package:journal_app/services/auth.dart';
 
 class ProfileScreen extends StatefulWidget {
   final AuthMethods auth;
-  const ProfileScreen({super.key, required this.auth});
+  final String type;
+  const ProfileScreen({super.key, required this.auth, required this.type});
 
   @override
   State<ProfileScreen> createState() => _ProfileScreenState();
@@ -29,6 +30,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
       fConnected = "Connect to Facebook";
     }
 
+    String eConnected = widget.auth.fetchField("email") ?? "Connect to Email";
+    if (eConnected == "") {
+      eConnected = "Connect to Email";
+    }
+
     googleConnect() async {
       if(gConnected == "Connect to Google"){
         try{
@@ -38,6 +44,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
               content: Text("Connected Successfully"),
             ),
           );
+          setState(() {
+          });
         } catch(e){
             ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
@@ -78,6 +86,19 @@ class _ProfileScreenState extends State<ProfileScreen> {
         );
       }
     }
+
+    emailConnect() async {
+      if(eConnected == "Connect to Email"){
+        _showPopup(context);
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text("Account already Connected"),
+          ),
+        );
+      }
+    }
+
     return Scaffold(
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -110,6 +131,19 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     ),
                   ),
                   const SizedBox(height: 8),
+
+                  // Add text inside a container with black background to show the type of login
+                  Container(
+                    color: Colors.black,
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    child: Text(
+                      "Logged in via ${widget.type}",
+                      style: const TextStyle(
+                        fontSize: 14,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ),
                 ],
               ),
             ),
@@ -117,7 +151,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
               height: 1,
               color: Colors.grey,
             ),
-            const SizedBox(height: 16),
             // 2nd Half
             Expanded(
               child: Column(
@@ -125,7 +158,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 children: [
                   ElevatedButton.icon(
                     onPressed: () {
-                      // Add functionality for Sync Data button
+                      emailConnect();
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.black, // Use a different color for Sync Data
@@ -136,8 +169,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       padding: EdgeInsets.symmetric(vertical: 16.0),
                       minimumSize: Size(double.infinity, 0),
                     ),
-                    icon: Icon(Icons.sync),
-                    label: Text('Sync Data'),
+                    icon: Icon(Icons.email),
+                    label: Text(eConnected),
                   ),
                   ElevatedButton.icon(
                     onPressed: () {
@@ -157,6 +190,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   ),
                   ElevatedButton.icon(
                     onPressed: () {
+                      facebookConnect();
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.blue, // Use a different color for Connect with Google
@@ -170,6 +204,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     icon: Icon(Icons.facebook),
                     label: Text(fConnected),
                   ),
+
+                  const SizedBox(height: 16),
+
                   ElevatedButton.icon(
                     onPressed: () {
                       widget.auth.logout();
@@ -195,5 +232,98 @@ class _ProfileScreenState extends State<ProfileScreen> {
       ),
     );
   }
-  
+
+  void _showPopup(BuildContext context) {
+    String email = "";
+    String password = "";
+
+    connectEmail() async {
+      try{
+        await widget.auth.linkAccountWithEmailPassword(email, password);
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text("Connected Successfully"),
+          ),
+        );
+      } catch(e){
+          ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text("Error Connecting"),
+          ),
+        );
+      }
+    }
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return Dialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16.0),
+          ),
+          elevation: 0.0,
+          backgroundColor: Colors.transparent,
+          child: Container(
+            padding: EdgeInsets.all(16.0),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(16.0),
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                SizedBox(
+                  height: 100.0,
+                  child: Image.asset(
+                    "assets/logo.png", // Replace with the path to your app logo
+                    fit: BoxFit.contain,
+                  ),
+                ),
+                const SizedBox(height: 10.0),
+                const Text(
+                  'Add Email and Password',
+                  style: TextStyle(
+                    fontSize: 18.0,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                SizedBox(height: 16.0),
+                TextFormField(
+                  keyboardType: TextInputType.emailAddress,
+                  decoration: InputDecoration(
+                    labelText: 'Enter Email',
+                    border: OutlineInputBorder(),
+                  ),
+                  onChanged: (value) {
+                    email = value;
+                  },
+                ),
+                SizedBox(height: 16.0),
+                TextFormField(
+                  obscureText: true,
+                  decoration: InputDecoration(
+                    labelText: 'Enter Password',
+                    border: OutlineInputBorder(),
+                  ),
+                  onChanged: (value) {
+                    password = value;
+                  },
+                ),
+                SizedBox(height: 16.0),
+                ElevatedButton(
+                  onPressed: () {
+                    connectEmail();
+                    print('Email: $email, Password: $password');
+                    Navigator.of(context).pop(); // Close the dialog
+                  },
+                  child: Text('Submit'),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
 }

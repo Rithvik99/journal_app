@@ -35,7 +35,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
     return Scaffold(
       body: Padding(
-        padding: const EdgeInsets.all(10.0),
+        padding: const EdgeInsets.all(20.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
@@ -59,7 +59,7 @@ class _HomeScreenState extends State<HomeScreen> {
               // Add any other widgets you may need in this row
             ],
           ),
-          const SizedBox(height: 30),
+          const SizedBox(height: 40),
             Container(
               decoration: BoxDecoration(
                 border: Border.all(color: Colors.grey),
@@ -90,7 +90,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 onDaySelected: _onDaySelected,
               ),
             ),
-            const SizedBox(height: 20),
+            const SizedBox(height: 40),
             Container(
               decoration: BoxDecoration(
                 border: Border.all(color: Colors.grey),

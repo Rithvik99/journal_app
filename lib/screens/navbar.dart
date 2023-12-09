@@ -6,7 +6,8 @@ import 'package:journal_app/services/auth.dart';
 
 class NavBar extends StatefulWidget {
   final AuthMethods auth;
-  const NavBar({super.key, required this.auth});
+  final String type;
+  const NavBar({super.key, required this.auth, required this.type});
 
   @override
   _NavBarState createState() => _NavBarState();
@@ -17,10 +18,9 @@ class _NavBarState extends State<NavBar> {
 
   @override
   Widget build(BuildContext context) {
-    
     final List<Widget> _pages = <Widget>[
       HomeScreen(auth: widget.auth),
-      ProfileScreen(auth: widget.auth),
+      ProfileScreen(auth: widget.auth, type: widget.type),
     ];
 
     return Scaffold(

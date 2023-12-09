@@ -56,7 +56,7 @@ class _ViewJournalState extends State<ViewJournal> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Journal Entries for ${widget.date}'),
+        title: Text('${widget.date}'),
         leading: IconButton(
           icon: Icon(Icons.arrow_back),
           onPressed: () {
@@ -73,12 +73,21 @@ class _ViewJournalState extends State<ViewJournal> {
       future: fetchJournals(),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.done) {
+          if (journalEntries.isEmpty) {
+            return Center(
+              child: Text(
+                "No journal entries for ${widget.date}",
+                style: TextStyle(fontSize: 18),
+              ),
+            );
+          }
+
           return Padding(
-      padding: const EdgeInsets.all(16.0),
-      child: ListView.builder(
-        itemCount: journalEntries.length,
-        itemBuilder: (context, index) {
-          return Card(
+            padding: const EdgeInsets.all(16.0),
+            child: ListView.builder(
+              itemCount: journalEntries.length,
+              itemBuilder: (context, index) {
+                return Card(
                   elevation: 3,
                   margin: EdgeInsets.symmetric(vertical: 8),
                   child: Padding(

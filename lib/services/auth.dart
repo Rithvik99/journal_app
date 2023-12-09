@@ -221,13 +221,37 @@ class AuthMethods{
       print("Google Account Linked");
 
       await _users.doc(user.uid).update({
-        'google': googleSignInAccount.email
+        'google': googleSignInAccount.email,
+        'profilePic': googleSignInAccount.photoUrl
       });
 
       userData!['google'] = googleSignInAccount.email;
       print("Account Linked to Db");
     } catch(e){
       print("Linking Google Account Error");
+      print(e);
+    }
+  }
+
+  Future<void> linkAccountWithEmailPassword(String email, String password) async{
+    try{
+      AuthCredential emailCredential = EmailAuthProvider.credential(email: email, password: password);
+
+      print("Email Credential Created");
+
+      User? user = auth.currentUser;
+      await user!.linkWithCredential(emailCredential);
+
+      print("Email Account Linked");
+
+      await _users.doc(user.uid).update({
+        'email': email
+      });
+
+      userData!['email'] = email;
+      print("Account Linked to Db");
+    } catch(e){
+      print("Linking Email Account Error");
       print(e);
     }
   }

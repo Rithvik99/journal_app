@@ -27,12 +27,15 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
   final AuthMethods _auth = AuthMethods();
 
-
   registration()async{
     if(password!=null && userNameEditingController.text!="" && emailEditingController.text!=""){
       bool created = await _auth.signUpWithEmailAndPassword(emailEditingController.text, passwordEditingController.text, userNameEditingController.text, context);
       if(created){
-        Navigator.push(context, MaterialPageRoute(builder: (context)=>NavBar(auth: _auth)));
+        // clear the text controllers
+        userNameEditingController.clear();
+        emailEditingController.clear();
+        passwordEditingController.clear();
+        Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=>NavBar(auth: _auth, type: "email")));
       } else{
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
@@ -49,7 +52,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
       bool google = await _auth.signInWithGoogle();
 
       if(google){
-        Navigator.push(context, MaterialPageRoute(builder: (context)=>NavBar(auth: _auth)));
+        // clear the text controllers
+        userNameEditingController.clear();
+        emailEditingController.clear();
+        passwordEditingController.clear();
+        Navigator.push(context, MaterialPageRoute(builder: (context)=>NavBar(auth: _auth, type: "google")));
       } else{
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
@@ -59,6 +66,29 @@ class _RegisterScreenState extends State<RegisterScreen> {
       }
     } catch(e){
       print("Google Login Error");
+      print(e);
+    }
+  }
+
+  facebookLogin() async {
+    try{
+      bool facebook = await _auth.oauth_facebook();
+
+      if(facebook){
+        // clear the text controllers
+        userNameEditingController.clear();
+        emailEditingController.clear();
+        passwordEditingController.clear();
+        Navigator.push(context, MaterialPageRoute(builder: (context)=>NavBar(auth: _auth, type: "facebook")));
+      } else{
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text("Error occured while creating account"),
+          ),
+        );
+      }
+    } catch(e){
+      print("Facebook Login Error");
       print(e);
     }
   }
@@ -104,7 +134,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
         }
         return null;
       },
-      onSaved: (value) 
+      onSaved: (value)
       {
         emailEditingController.text = value!;
       },
@@ -227,7 +257,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
         EdgeInsets.fromLTRB(20.0, 15.0, 20.0, 15.0),
 
         onPressed: () {
-          // Handle Facebook login logic here
+          facebookLogin();
         },
 
         child: const Row(
@@ -306,6 +336,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         const SizedBox(width: 5.0),
                         GestureDetector(
                           onTap: () {
+                            // clear text controllers
+                            userNameEditingController.clear();
+                            emailEditingController.clear();
+                            passwordEditingController.clear();
                             Navigator.push(
                               context,
                               MaterialPageRoute(
