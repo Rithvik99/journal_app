@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:journal_app/screens/loginscreen.dart';
 import 'package:journal_app/services/auth.dart';
 
 class ProfileScreen extends StatefulWidget {
@@ -134,13 +135,20 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
                   // Add text inside a container with black background to show the type of login
                   Container(
-                    color: Colors.black,
+                    height: 50,
+                    width: double.infinity,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(10),
+                      color: Colors.black,
+                    ),
                     padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                    child: Text(
-                      "Logged in via ${widget.type}",
-                      style: const TextStyle(
-                        fontSize: 14,
-                        color: Colors.white,
+                    child: Center(
+                      child: Text(
+                        "Logged in via ${widget.type}",
+                        style: const TextStyle(
+                          fontSize: 14,
+                          color: Colors.white,
+                        ),
                       ),
                     ),
                   ),
@@ -210,7 +218,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   ElevatedButton.icon(
                     onPressed: () {
                       widget.auth.logout();
-                      Navigator.pop(context);
+                      // Navigator.pop(context);
+                      Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => LoginScreen()));
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.red, // Use a different color for Log Out

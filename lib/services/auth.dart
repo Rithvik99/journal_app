@@ -177,7 +177,7 @@ class AuthMethods{
       } else {
         await _users.doc(userDeatils?.uid).set({
           'username': username,
-          'email': gmail,
+          'email': "",
           'journals': [],
           'google': gmail,
           'facebook': '',
@@ -275,7 +275,7 @@ class AuthMethods{
       await user?.linkWithCredential(facebookCredential);
 
       //Get The Gmail
-       final graphResponse = await http.get(
+      final graphResponse = await http.get(
           Uri.parse('https://graph.facebook.com/v14.0/me?fields=id,name,email'),
           headers: {'Authorization': 'Bearer ${accessToken.token}'},
         );
