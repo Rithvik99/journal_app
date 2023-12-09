@@ -81,16 +81,23 @@ OAuth (Open Authorization) is employed to securely access user resources on a se
 ### Testing Environment:
    - Android simulator
 
-## Results/Observations
+## Setting Up a Basic Flutter App
 
-Details about the project results and observations during development.
+To set up and run the basic Flutter app:
 
-## References
+1. **Install Flutter:**
+   - Follow the instructions on the [official Flutter installation guide](https://flutter.dev/docs/get-started/install) to set up Flutter on your machine.
 
-1. [Google Sign-In - Android](https://developers.google.com/identity/sign-in/android/start-integrating)
-2. [Facebook Login - Android](https://developers.facebook.com/docs/facebook-login/android/)
-3. [FlutterFire UI - Simplifying Social Logins in Flutter](https://medium.com/flutter-community/flutterfire-ui-simplifying-social-logins-in-flutter-27cc0f17890a)
-4. [Firebase Firestore Documentation](https://firebase.google.com/docs/firestore)
-5. [Firebase Authentication Documentation](https://firebase.google.com/docs/auth)
+2. **Install Dependencies:**
+   - Open a terminal and navigate to the project root directory.
+   - Run `flutter pub get` to install the project dependencies.
+
+3. **Run the App:**
+   - Connect a device or start an emulator.
+   - Run `flutter run` in the terminal to build and launch the app on your device/emulator.
+
+4. **Explore the Code:**
+   - Dive into the `lib` directory to explore the source code.
+   - Make any necessary adjustments based on your project requirements.
 
 Feel free to explore the source code and contribute to the development of this intuitive and secure journaling application. Happy journaling!
