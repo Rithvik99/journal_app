@@ -19,9 +19,64 @@ class _ProfileScreenState extends State<ProfileScreen> {
       uriI =
           "https://www.pngitem.com/pimgs/m/30-307416_profile-icon-png-image-free-download-searchpng-employee.png";
     }
-    String gConnected = widget.auth.fetchField("google") ?? "Connect with Google";
+    String gConnected = widget.auth.fetchField("google") ?? "Connect to Google";
     if (gConnected == "") {
-      gConnected = "Connect with Google";
+      gConnected = "Connect to Google";
+    }
+
+    String fConnected = widget.auth.fetchField("facebook") ?? "Connect to Facebook";
+    if (fConnected == "") {
+      fConnected = "Connect to Facebook";
+    }
+
+    googleConnect() async {
+      if(gConnected == "Connect to Google"){
+        try{
+          await widget.auth.linkAccountWithGoogle();
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text("Connected Successfully"),
+            ),
+          );
+        } catch(e){
+            ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text("Error Connecting"),
+            ),
+          );
+        }
+      }else{
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text("Account already connected"),
+          ),
+        );
+      }
+    }
+
+    facebookConnect() async {
+      if(fConnected == "Connect to Facebook"){
+        try{
+          await widget.auth.linkAccountWithFacebook();
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text("Connected Successfully"),
+            ),
+          );
+        } catch(e){
+            ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text("Error Connecting"),
+            ),
+          );
+        }
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text("Account already Connected"),
+          ),
+        );
+      }
     }
     return Scaffold(
       body: Padding(
@@ -62,7 +117,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               height: 1,
               color: Colors.grey,
             ),
-            SizedBox(height: 16),
+            const SizedBox(height: 16),
             // 2nd Half
             Expanded(
               child: Column(
@@ -73,7 +128,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       // Add functionality for Sync Data button
                     },
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.blue, // Use a different color for Sync Data
+                      backgroundColor: Colors.black, // Use a different color for Sync Data
                       onPrimary: Colors.white, // Text color
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(10.0),
@@ -86,7 +141,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   ),
                   ElevatedButton.icon(
                     onPressed: () {
-                      // Add functionality for Connect with Google button
+                      googleConnect();
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.green, // Use a different color for Connect with Google
@@ -94,11 +149,26 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(10.0),
                       ),
+                      padding: const EdgeInsets.symmetric(vertical: 16.0),
+                      minimumSize: const Size(double.infinity, 0),
+                    ),
+                    icon: const Icon(Icons.g_mobiledata),
+                    label: Text(gConnected),
+                  ),
+                  ElevatedButton.icon(
+                    onPressed: () {
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.blue, // Use a different color for Connect with Google
+                      onPrimary: Colors.white, // Text color
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10.0),
+                      ),
                       padding: EdgeInsets.symmetric(vertical: 16.0),
                       minimumSize: Size(double.infinity, 0),
                     ),
-                    icon: Icon(Icons.g_mobiledata),
-                    label: Text(gConnected),
+                    icon: Icon(Icons.facebook),
+                    label: Text(fConnected),
                   ),
                   ElevatedButton.icon(
                     onPressed: () {
@@ -125,4 +195,5 @@ class _ProfileScreenState extends State<ProfileScreen> {
       ),
     );
   }
+  
 }

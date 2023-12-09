@@ -121,7 +121,7 @@ class AuthMethods{
     }
   }
 
-  Future<void> addJournalEntry(String content, String title, String date)async{
+  Future<void> addJournalEntry(String title, String content, String date)async{
     try{
       DocumentReference journalDoc = await _journals.add({
         'title': title,
@@ -232,6 +232,46 @@ class AuthMethods{
     }
   }
 
+  Future<void> linkAccountWithFacebook() async {
+    try{await FacebookAuth.instance.logOut();
+      final LoginResult result = await FacebookAuth.instance.login();
+      if (result.status == LoginStatus.cancelled) {
+        print('Facebook sign-in canceled.');
+        return;
+      }
+
+      final AccessToken accessToken = result.accessToken!;
+      final AuthCredential facebookCredential =
+          FacebookAuthProvider.credential(accessToken.token);
+
+      print("Fetched Credentials");
+
+      // Get the current user
+      User? user = auth.currentUser;
+      await user?.linkWithCredential(facebookCredential);
+
+      //Get The Gmail
+       final graphResponse = await http.get(
+          Uri.parse('https://graph.facebook.com/v14.0/me?fields=id,name,email'),
+          headers: {'Authorization': 'Bearer ${accessToken.token}'},
+        );
+        final Map<String, dynamic> facebookUserData = json.decode(graphResponse.body);
+        String facebookEmail = facebookUserData['email'] ?? '';
+
+
+      // Modify fields
+      await _users.doc(user?.uid).update({
+        'facebook': facebookEmail,
+      });
+
+      userData!["facebook"] = facebookEmail;
+
+      print('Account linked with Facebook successfully!');
+    } catch (e) {
+      print('Error linking account with Facebook: $e');
+    }
+  }
+
   Future<bool> oauth_facebook() async {
     try {
       print("called facebook auth");
@@ -241,12 +281,26 @@ class AuthMethods{
       if (result.status == LoginStatus.success) {
         final AccessToken accessToken = result.accessToken!;
         final graphResponse = await http.get(
-          Uri.parse('https://graph.facebook.com/v14.0/me?fields=id,name,email'),
+          // Uri.parse('https://graph.facebook.com/v14.0/me?fields=id,name,email,picture'),
+          Uri.parse('https://graph.facebook.com/v2.12/me?fields=id,name,email,picture.width(800).height(800)'),
           headers: {'Authorization': 'Bearer ${accessToken.token}'},
         );
         final Map<String, dynamic> userData2 = json.decode(graphResponse.body);
+        print("hii there");
+        print(userData2);
         String facebookName = userData2['name'] ?? '';
         String facebookEmail = userData2['email'] ?? '';
+        // Extract profile picture URL
+        String profilePicUrl = '';
+        if (userData2.containsKey('picture') &&
+            userData2['picture'] != null &&
+            userData2['picture'].containsKey('data') &&
+            userData2['picture']['data'] != null &&
+            userData2['picture']['data'].containsKey('url')) {
+          profilePicUrl = userData2['picture']['data']['url'];
+        }
+        print("Pic URL");
+        print(profilePicUrl);
         final AuthCredential creds =
         FacebookAuthProvider.credential(result.accessToken!.token);
         UserCredential auth2 = await auth.signInWithCredential(creds);
@@ -261,13 +315,22 @@ class AuthMethods{
         } else {
           await _users.doc(auth2.user?.uid).set({
             "username": facebookName,
+            'email': '',
+            'journals': [],
+            'google': '',
             'facebook': facebookEmail,
-            "transaction": {},
-            "monthly": {},
+            'profilePic': '',
+            'date': convertDate(DateTime.now())
           });
         }
 
-        userData = userData2;
+        userDoc = await _users.doc(auth2.user?.uid).get();
+        print("User Doc Fetched");
+
+        if (userDoc.exists) {
+          userData = userDoc.data() as Map<String, dynamic>;
+          print("User Data Stored");
+        }
 
         return true;
       } else if (result.status == LoginStatus.cancelled) {
