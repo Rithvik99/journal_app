@@ -1,7 +1,11 @@
+import 'dart:convert';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:http/http.dart' as http;
 
 class AuthMethods{
   final FirebaseAuth auth = FirebaseAuth.instance;
@@ -225,6 +229,57 @@ class AuthMethods{
     } catch(e){
       print("Linking Google Account Error");
       print(e);
+    }
+  }
+
+  Future<bool> oauth_facebook() async {
+    try {
+      print("called facebook auth");
+      await FacebookAuth.instance.logOut();
+      final LoginResult result = await FacebookAuth.instance.login();
+
+      if (result.status == LoginStatus.success) {
+        final AccessToken accessToken = result.accessToken!;
+        final graphResponse = await http.get(
+          Uri.parse('https://graph.facebook.com/v14.0/me?fields=id,name,email'),
+          headers: {'Authorization': 'Bearer ${accessToken.token}'},
+        );
+        final Map<String, dynamic> userData2 = json.decode(graphResponse.body);
+        String facebookName = userData2['name'] ?? '';
+        String facebookEmail = userData2['email'] ?? '';
+        final AuthCredential creds =
+        FacebookAuthProvider.credential(result.accessToken!.token);
+        UserCredential auth2 = await auth.signInWithCredential(creds);
+        DocumentSnapshot userDoc =
+            await _users.doc(auth2.user?.uid).get();
+
+        if (userDoc.exists) {
+          print('User Already Exist: Updating Only Facebook');
+          await _users.doc(auth2.user?.uid).update({
+            'facebook': facebookEmail,
+          });
+        } else {
+          await _users.doc(auth2.user?.uid).set({
+            "username": facebookName,
+            'facebook': facebookEmail,
+            "transaction": {},
+            "monthly": {},
+          });
+        }
+
+        userData = userData2;
+
+        return true;
+      } else if (result.status == LoginStatus.cancelled) {
+        print("Facebook login cancelled");
+        return false;
+      } else {
+        print("Facebook login failed: ${result.message}");
+        return false;
+      }
+    } catch (e) {
+      print("Facebook login error: $e");
+      return false;
     }
   }
 

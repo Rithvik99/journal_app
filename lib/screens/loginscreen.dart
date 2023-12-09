@@ -59,6 +59,26 @@ class _LoginScreenState extends State<LoginScreen> {
     }
   }
 
+  // facebook login
+  facebookLogin() async {
+    try{
+      bool facebook = await _auth.oauth_facebook();
+
+      if(facebook){
+        Navigator.push(context, MaterialPageRoute(builder: (context)=>NavBar(auth: _auth)));
+      } else{
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text("Error occured while creating account"),
+          ),
+        );
+      }
+    } catch(e){
+      print("Facebook Login Error");
+      print(e);
+    }
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -197,7 +217,7 @@ class _LoginScreenState extends State<LoginScreen> {
         padding: const EdgeInsets.fromLTRB(20.0, 15.0, 20.0, 15.0),
 
         onPressed: () {
-          // Handle Facebook login logic here
+          facebookLogin();
         },
 
         child: const Row(
